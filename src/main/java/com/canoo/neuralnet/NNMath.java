@@ -94,4 +94,16 @@ public class NNMath {
         }
         return result;
     }
+
+    public static double[] normalize(double[] input){
+        double sum = 0.0;
+        double[] result = new double[input.length];
+        for (int i = 0; i < input.length; i++) {
+            sum += input[i];
+        }
+        for (int i = 0; i < input.length; i++) {
+            result[i] = input[i] / sum;
+        }
+        return result;
+    }
 }

@@ -120,4 +120,20 @@ public class NNMathTest {
         assertThat(MatrixUtil.matrixToString(transposed), is(expected));
 
     }
+
+    @Test
+    public void normalize() throws Exception {
+
+        //given
+        double[] input = {5,6,9};
+
+        double[] normalized = NNMath.normalize(input);
+
+
+        assertThat(normalized[0], is(0.25));
+        assertThat(normalized[1], is(0.3));
+        assertThat(normalized[2], is(0.45));
+
+
+    }
 }
