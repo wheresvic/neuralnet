@@ -4,7 +4,8 @@ import static com.canoo.neuralnet.MatrixUtil.apply;
 import static com.canoo.neuralnet.NNMath.*;
 
 /**
- * Created by codecamp on 14/04/16.
+ * https://medium.com/technology-invention-and-more/how-to-build-a-multi-layered-neural-network-in-python-53ec3d1d326a#.9kcfharq6
+ * http://stevenmiller888.github.io/mind-how-to-build-a-neural-network-part-2/
  */
 public class NeuralNet {
     private final NeuronLayer layer1, layer2;
@@ -47,6 +48,7 @@ public class NeuralNet {
             double[][] deltaLayer1 = scalarMultiply(errorLayer1, apply(outputLayer1, NNMath::sigmoidDerivative)); // 4x4
 
             // Calculate how much to adjust the weights by
+            // Since we’re dealing with matrices, we handle the division by multiplying the delta output sum with the inputs' transpose!
 
             double[][] adjustmentLayer1 = matrixMultiply(matrixTranspose(inputs), deltaLayer1); // 4x4
             double[][] adjustmentLayer2 = matrixMultiply(matrixTranspose(outputLayer1), deltaLayer2); // 4x1
