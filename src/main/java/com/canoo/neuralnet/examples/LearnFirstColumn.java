@@ -1,6 +1,5 @@
 package com.canoo.neuralnet.examples;
 
-import com.canoo.neuralnet.MatrixUtil;
 import com.canoo.neuralnet.NeuralNet;
 import com.canoo.neuralnet.NeuronLayer;
 
@@ -12,9 +11,9 @@ public class LearnFirstColumn {
     /**
      * The goal of this neural net example is to train it on a small dataset where the output
      * is simply the value of the first input parameter
-     *
+     * <p>
      * e.g.
-     *
+     * <p>
      * 0 0 1 -> 0
      * 1 1 1 -> 1
      * 1 0 1 -> 1
@@ -38,13 +37,15 @@ public class LearnFirstColumn {
                 {0, 0, 1},
                 {1, 1, 1},
                 {1, 0, 1},
-                {0, 1, 1}
+                {0, 1, 1},
+                {0, 0, 0}
         };
 
         double[][] outputs = new double[][]{
                 {0},
                 {1},
                 {1},
+                {0},
                 {0}
         };
 
@@ -62,9 +63,6 @@ public class LearnFirstColumn {
 
         // 1, 0, 0
         predict(new double[][]{{1, 0, 0}}, net);
-
-        // 0, 0, 0
-        predict(new double[][]{{0, 0, 0}}, net);
 
         // 0, 1, 0
         predict(new double[][]{{0, 1, 0}}, net);
