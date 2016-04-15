@@ -9,7 +9,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -26,19 +25,18 @@ public class LearnIris {
      *
      * @param args
      */
-    public static void main(String args[]) {
+    public static void main(String args[]) throws IOException, URISyntaxException {
 
         // create hidden layer that has 4 neurons and 4 inputs per neuron
-        NeuronLayer layer1 = new NeuronLayer(3, 4);
+        NeuronLayer layer1 = new NeuronLayer(NeuronLayer.ActivationFunctionType.SIGMOID, 4, 4);
 
         // create output layer that has 3 neurons representing the prediction and 4 inputs for this neuron
         // (mapped from the previous hidden layer)
-        NeuronLayer layer2 = new NeuronLayer(1, 3);
+        NeuronLayer layer2 = new NeuronLayer(NeuronLayer.ActivationFunctionType.SIGMOID, 1, 4);
 
-        NeuralNet net = new NeuralNet(layer1, layer2);
+        NeuralNet net = new NeuralNet(layer1, layer2, 1.0);
 
         List<Plant> plants = readFile();
-
 
         int trainingSetSize = (int) Math.floor(plants.size() * 0.65);
 
@@ -47,17 +45,16 @@ public class LearnIris {
         for (int i = 0; i < trainingSetSize; i++) {
             Plant plant = plants.get(i);
             inputs[i] = NNMath.normalize(new double[]{plant.a, plant.b, plant.c, plant.d});
-            //inputs[i] = new double[]{plant.a, plant.b, plant.c, plant.d};
-            if(plant.category == 0) {
+            // inputs[i] = new double[]{plant.a, plant.b, plant.c, plant.d};
+            if (plant.category == 0) {
                 outputs[i] = new double[]{0.0};
-            } else if(plant.category == 1) {
+            } else if (plant.category == 1) {
                 outputs[i] = new double[]{0.5};
             } else {
                 outputs[i] = new double[]{1.0};
             }
 
         }
-
 
         System.out.println("Training the neural net...");
         net.train(inputs, outputs, 500);
@@ -71,20 +68,25 @@ public class LearnIris {
 
         // calculate the predictions on unknown data
         int successful = 0;
-        for (int j = trainingSetSize; j < plants.size() ; j++) {
+        for (int j = trainingSetSize; j < plants.size(); j++) {
             Plant plant = plants.get(j);
-            //double[][] testInput = {NNMath.normalize(new double[]{plant.a, plant.b, plant.c, plant.d})};
+            // double[][] testInput = {NNMath.normalize(new double[]{plant.a, plant.b, plant.c, plant.d})};
             double[][] testInput = {new double[]{plant.a, plant.b, plant.c, plant.d}};
-            boolean success = predict(testInput, plant.category, net);
-            if(success){
+            boolean success = predict(testInput, plant.category, net, 0.1);
+            if (success) {
                 successful++;
             }
         }
-        System.out.println("Correctly predicted " + successful +" out of " + (plants.size() - trainingSetSize));
+
+        int testSetSize = plants.size() - trainingSetSize;
+
+        System.out.println("Correctly predicted " + successful + " out of " + testSetSize);
+        double accuracy = ((double) successful / (double) testSetSize) * 100;
+        System.out.println("Accuracy: " + (int) accuracy + " %");
 
     }
 
-    private static List<Plant> readFile() {
+    private static List<Plant> readFile() throws URISyntaxException, IOException {
         List<Plant> plants = new ArrayList<>();
 
         try (Stream<String> stream = Files.lines(Paths.get(LearnIris.class.getResource("irisShuffle.txt").toURI()))) {
@@ -94,28 +96,30 @@ public class LearnIris {
                 plants.add(plant);
             });
 
-        } catch (IOException | URISyntaxException e) {
-            e.printStackTrace();
         }
+
         return plants;
     }
 
-    public static boolean predict(double[][] testInput, double expected, NeuralNet net) {
+    public static boolean predict(double[][] testInput, double expected, NeuralNet net, double errorMargin) {
         net.think(testInput);
 
         // then
+        double expectedValue = expected / 2;
+        double predictedValue = net.getOutput()[0][0];
+
         System.out.println("Prediction on data "
                 + format(testInput[0][0]) + " "
                 + format(testInput[0][1]) + " "
                 + format(testInput[0][2]) + " "
                 + format(testInput[0][3]) + ": "
-                + format(net.getOutput()[0][0])+ ", expected -> " +  expected/2 + " ");
+                + format(predictedValue) + ", expected -> " + expectedValue + " ");
 
-        return expected/2-0.1 < net.getOutput()[0][0] && net.getOutput()[0][0] <expected/2+0.1;
+        return expectedValue - errorMargin < predictedValue && predictedValue < expectedValue + errorMargin;
     }
 
-    private static String format(double x){
-        return String.format("%.03f",x);
+    private static String format(double x) {
+        return String.format("%.03f", x);
 
     }
 
