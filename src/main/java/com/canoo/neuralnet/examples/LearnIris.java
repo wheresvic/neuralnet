@@ -29,11 +29,11 @@ public class LearnIris {
     public static void main(String args[]) {
 
         // create hidden layer that has 4 neurons and 4 inputs per neuron
-        NeuronLayer layer1 = new NeuronLayer(NeuronLayer.InitialWeightType.RANDOM, 3, 4);
+        NeuronLayer layer1 = new NeuronLayer(3, 4);
 
         // create output layer that has 3 neurons representing the prediction and 4 inputs for this neuron
         // (mapped from the previous hidden layer)
-        NeuronLayer layer2 = new NeuronLayer(NeuronLayer.InitialWeightType.RANDOM, 1, 3);
+        NeuronLayer layer2 = new NeuronLayer(1, 3);
 
         NeuralNet net = new NeuralNet(layer1, layer2);
 

@@ -24,11 +24,11 @@ public class LearnFirstColumn {
     public static void main(String args[]) {
 
         // create hidden layer that has 4 neurons and 3 inputs per neuron
-        NeuronLayer layer1 = new NeuronLayer(NeuronLayer.InitialWeightType.RANDOM, 4, 3);
+        NeuronLayer layer1 = new NeuronLayer(4, 3);
 
         // create output layer that has 1 neuron representing the prediction and 4 inputs for this neuron
         // (mapped from the previous hidden layer)
-        NeuronLayer layer2 = new NeuronLayer(NeuronLayer.InitialWeightType.RANDOM, 1, 4);
+        NeuronLayer layer2 = new NeuronLayer(1, 4);
 
         NeuralNet net = new NeuralNet(layer1, layer2);
 

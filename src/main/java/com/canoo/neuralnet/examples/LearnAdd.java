@@ -4,6 +4,7 @@ import com.canoo.neuralnet.NeuralNet;
 import com.canoo.neuralnet.NeuronLayer;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -21,15 +22,15 @@ public class LearnAdd {
     public static void main(String args[]) {
 
         // create hidden layer that has 4 neurons and 2 inputs per neuron
-        NeuronLayer layer1 = new NeuronLayer(NeuronLayer.InitialWeightType.RANDOM, 4, 2);
+        NeuronLayer layer1 = new NeuronLayer(4, 2);
 
         // create output layer that has 1 neuron representing the prediction and 4 inputs for this neuron
         // (mapped from the previous hidden layer)
-        NeuronLayer layer2 = new NeuronLayer(NeuronLayer.InitialWeightType.RANDOM, 1, 4);
+        NeuronLayer layer2 = new NeuronLayer(1, 4);
 
         NeuralNet net = new NeuralNet(layer1, layer2);
 
-        List<Tuple> tuples = createTrainingSet(20, 5);
+        List<Tuple> tuples = createTrainingSet(20, (int) new Date().getTime());
 
         double[][] inputs = new double[tuples.size()][2];
         double[][] outputs = new double[tuples.size()][1];
@@ -41,7 +42,7 @@ public class LearnAdd {
 
 
         System.out.println("Training the neural net...");
-        net.train(inputs, outputs, 10000);
+        net.train(inputs, outputs, 1000);
         System.out.println("Finished training");
 
         System.out.println("Layer 1 weights");

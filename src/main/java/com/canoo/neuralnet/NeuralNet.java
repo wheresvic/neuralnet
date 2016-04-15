@@ -11,24 +11,19 @@ import static com.canoo.neuralnet.NNMath.*;
  */
 public class NeuralNet {
 
-    public enum ActivationFunction {
-        SIGMOID,
-        TANH
-    }
-
     private final NeuronLayer layer1, layer2;
     private double[][] outputLayer1;
     private double[][] outputLayer2;
-
-    private Function<Double,Double> activationFunction;
-    private Function<Double,Double> activationFunctionDerivative;
-
+    private final double learningRate;
 
     public NeuralNet(NeuronLayer layer1, NeuronLayer layer2) {
+        this(layer1, layer2, 0.1);
+    }
+
+    public NeuralNet(NeuronLayer layer1, NeuronLayer layer2, double learningRate) {
         this.layer1 = layer1;
         this.layer2 = layer2;
-        this.activationFunction = NNMath::sigmoid;
-        this.activationFunctionDerivative = NNMath::sigmoidDerivative;
+        this.learningRate = learningRate;
     }
 
     /**
@@ -39,8 +34,8 @@ public class NeuralNet {
      * @param inputs
      */
     public void think(double[][] inputs) {
-        outputLayer1 = apply(matrixMultiply(inputs, layer1.weights), NNMath::tanh); // 4x4
-        outputLayer2 = apply(matrixMultiply(outputLayer1, layer2.weights), NNMath::tanh); // 4x1
+        outputLayer1 = apply(matrixMultiply(inputs, layer1.weights), layer1.activationFunction); // 4x4
+        outputLayer2 = apply(matrixMultiply(outputLayer1, layer2.weights), layer2.activationFunction); // 4x1
     }
 
     public void train(double[][] inputs, double[][] outputs, int numberOfTrainingIterations) {
@@ -53,13 +48,13 @@ public class NeuralNet {
             // calculate the error for layer 2
             // (the difference between the desired output and predicted output for each of the training inputs)
             double[][] errorLayer2 = matrixSubtract(outputs, outputLayer2); // 4x1
-            double[][] deltaLayer2 = scalarMultiply(errorLayer2, apply(outputLayer2, NNMath::sigmoidDerivative)); // 4x1
+            double[][] deltaLayer2 = scalarMultiply(errorLayer2, apply(outputLayer2, layer2.activationFunctionDerivative)); // 4x1
 
             // calculate the error for layer 1
             // (by looking at the weights in layer 1, we can determine by how much layer 1 contributed to the error in layer 2)
 
             double[][] errorLayer1 = matrixMultiply(deltaLayer2, matrixTranspose(layer2.weights)); // 4x4
-            double[][] deltaLayer1 = scalarMultiply(errorLayer1, apply(outputLayer1, NNMath::sigmoidDerivative)); // 4x4
+            double[][] deltaLayer1 = scalarMultiply(errorLayer1, apply(outputLayer1, layer1.activationFunctionDerivative)); // 4x4
 
             // Calculate how much to adjust the weights by
             // Since we’re dealing with matrices, we handle the division by multiplying the delta output sum with the inputs' transpose!
@@ -67,8 +62,8 @@ public class NeuralNet {
             double[][] adjustmentLayer1 = matrixMultiply(matrixTranspose(inputs), deltaLayer1); // 4x4
             double[][] adjustmentLayer2 = matrixMultiply(matrixTranspose(outputLayer1), deltaLayer2); // 4x1
 
-            adjustmentLayer1 = MatrixUtil.apply(adjustmentLayer1, (e) -> 0.1 * e);
-            adjustmentLayer2 = MatrixUtil.apply(adjustmentLayer2, (e) -> 0.1 * e);
+            adjustmentLayer1 = MatrixUtil.apply(adjustmentLayer1, (x) -> learningRate * x);
+            adjustmentLayer2 = MatrixUtil.apply(adjustmentLayer2, (x) -> learningRate * x);
 
             // adjust the weights
             this.layer1.adjustWeights(adjustmentLayer1);
