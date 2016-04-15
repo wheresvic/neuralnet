@@ -11,8 +11,6 @@ public class NeuronLayer {
 
     double[][] weights;
 
-    // public List<List<Double>> synapticWeights = new ArrayList<>();
-
     public NeuronLayer(int numberOfNeurons, int numberOfInputsPerNeuron) {
         this(InitialWeightType.RANDOM, numberOfNeurons, numberOfInputsPerNeuron);
     }
