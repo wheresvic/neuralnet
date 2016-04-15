@@ -13,6 +13,14 @@ public class NNMath {
         return x * (1 - x);
     }
 
+    public static double tanh(double x){
+        return Math.tanh(x);
+    }
+
+    public static double tanhDerivative(double x){
+        return 1 - Math.tanh(x) * Math.tanh(x);
+    }
+
     public static double[][] matrixMultiply(double[][] a, double[][] b) {
         if (a.length == 0 || b.length == 0 || a[0].length != b.length) {
             throw new IllegalArgumentException("Cannot multiply non n x m and m x p matrices");

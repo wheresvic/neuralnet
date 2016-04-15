@@ -29,17 +29,16 @@ public class LearnIris {
     public static void main(String args[]) {
 
         // create hidden layer that has 4 neurons and 4 inputs per neuron
-        NeuronLayer layer1 = new NeuronLayer(NeuronLayer.InitialWeightType.RANDOM, 4, 4);
+        NeuronLayer layer1 = new NeuronLayer(NeuronLayer.InitialWeightType.RANDOM, 3, 4);
 
         // create output layer that has 3 neurons representing the prediction and 4 inputs for this neuron
         // (mapped from the previous hidden layer)
-        NeuronLayer layer2 = new NeuronLayer(NeuronLayer.InitialWeightType.RANDOM, 1, 4);
+        NeuronLayer layer2 = new NeuronLayer(NeuronLayer.InitialWeightType.RANDOM, 1, 3);
 
         NeuralNet net = new NeuralNet(layer1, layer2);
 
         List<Plant> plants = readFile();
 
-        Collections.shuffle(plants);
 
         int trainingSetSize = (int) Math.floor(plants.size() * 0.65);
 
@@ -61,7 +60,7 @@ public class LearnIris {
 
 
         System.out.println("Training the neural net...");
-        net.train(inputs, outputs, 50);
+        net.train(inputs, outputs, 500);
         System.out.println("Finished training");
 
         System.out.println("Layer 1 weights");
@@ -88,7 +87,7 @@ public class LearnIris {
     private static List<Plant> readFile() {
         List<Plant> plants = new ArrayList<>();
 
-        try (Stream<String> stream = Files.lines(Paths.get(LearnIris.class.getResource("iris.txt").toURI()))) {
+        try (Stream<String> stream = Files.lines(Paths.get(LearnIris.class.getResource("irisShuffle.txt").toURI()))) {
             stream.forEach(l -> {
                 String[] parts = l.split(",");
                 Plant plant = new Plant(Double.parseDouble(parts[0]), Double.parseDouble(parts[1]), Double.parseDouble(parts[2]), Double.parseDouble(parts[3]), Integer.parseInt(parts[4]));

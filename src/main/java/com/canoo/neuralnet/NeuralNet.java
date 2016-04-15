@@ -1,5 +1,7 @@
 package com.canoo.neuralnet;
 
+import java.util.function.Function;
+
 import static com.canoo.neuralnet.MatrixUtil.apply;
 import static com.canoo.neuralnet.NNMath.*;
 
@@ -8,13 +10,25 @@ import static com.canoo.neuralnet.NNMath.*;
  * http://stevenmiller888.github.io/mind-how-to-build-a-neural-network-part-2/
  */
 public class NeuralNet {
+
+    public enum ActivationFunction {
+        SIGMOID,
+        TANH
+    }
+
     private final NeuronLayer layer1, layer2;
     private double[][] outputLayer1;
     private double[][] outputLayer2;
 
+    private Function<Double,Double> activationFunction;
+    private Function<Double,Double> activationFunctionDerivative;
+
+
     public NeuralNet(NeuronLayer layer1, NeuronLayer layer2) {
         this.layer1 = layer1;
         this.layer2 = layer2;
+        this.activationFunction = NNMath::sigmoid;
+        this.activationFunctionDerivative = NNMath::sigmoidDerivative;
     }
 
     /**
@@ -25,8 +39,8 @@ public class NeuralNet {
      * @param inputs
      */
     public void think(double[][] inputs) {
-        outputLayer1 = apply(matrixMultiply(inputs, layer1.weights), NNMath::sigmoid); // 4x4
-        outputLayer2 = apply(matrixMultiply(outputLayer1, layer2.weights), NNMath::sigmoid); // 4x1
+        outputLayer1 = apply(matrixMultiply(inputs, layer1.weights), NNMath::tanh); // 4x4
+        outputLayer2 = apply(matrixMultiply(outputLayer1, layer2.weights), NNMath::tanh); // 4x1
     }
 
     public void train(double[][] inputs, double[][] outputs, int numberOfTrainingIterations) {
@@ -53,6 +67,9 @@ public class NeuralNet {
             double[][] adjustmentLayer1 = matrixMultiply(matrixTranspose(inputs), deltaLayer1); // 4x4
             double[][] adjustmentLayer2 = matrixMultiply(matrixTranspose(outputLayer1), deltaLayer2); // 4x1
 
+            adjustmentLayer1 = MatrixUtil.apply(adjustmentLayer1, (e) -> 0.1 * e);
+            adjustmentLayer2 = MatrixUtil.apply(adjustmentLayer2, (e) -> 0.1 * e);
+
             // adjust the weights
             this.layer1.adjustWeights(adjustmentLayer1);
             this.layer2.adjustWeights(adjustmentLayer2);
@@ -62,6 +79,11 @@ public class NeuralNet {
             // double[][] errorLayer1 = NNMath.matrixSubtract(outputs, outputLayer1);
             // double[][] deltaLayer1 = NNMath.matrixMultiply(errorLayer1, MatrixUtil.apply(outputLayer1, NNMath::sigmoidDerivative));
             // double[][] adjustmentLayer1 = NNMath.matrixMultiply(NNMath.matrixTranspose(inputs), deltaLayer1);
+
+            if(i % 10000 == 0){
+                System.out.println(" Training iteration " + i + " of " + numberOfTrainingIterations);
+            }
+            //System.out.println(this);
 
         }
     }
