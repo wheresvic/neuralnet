@@ -42,7 +42,7 @@ public class LearnAdd {
 
 
         System.out.println("Training the neural net...");
-        net.train(inputs, outputs, 1000);
+        net.train(inputs, outputs, 10000);
         System.out.println("Finished training");
 
         System.out.println("Layer 1 weights");
